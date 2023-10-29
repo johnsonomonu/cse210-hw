@@ -1,11 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 class Entry
 {
-    public string Prompt { get; set; }
-    public string Response { get; set; }
-    public string Date { get; set; }
+    public string _prompt;
+    public string _response;
+    public string _date;
+
+    public void DisplayEntryInfo()
+    {
+        Console.WriteLine($"Date: {_date}");
+        Console.WriteLine($"Prompt: {_prompt}");
+        Console.WriteLine($"Response: {_response}\n");
+    }
 }
 
 class Journal
@@ -17,9 +25,54 @@ class Journal
         entries.Add(entry);
     }
 
-    public List<Entry> GetAllEntries()
+    public void DisplayAllEntries()
     {
-        return entries;
+        foreach (var entry in entries)
+        {
+            entry.DisplayEntryInfo();
+        }
+    }
+
+    public void SaveEntriesToFile(string filePath)
+    {
+        using (StreamWriter writer = new StreamWriter(filePath))
+        {
+            foreach (var entry in entries)
+            {
+                writer.WriteLine($"{entry._date},{entry._prompt},{entry._response}");
+            }
+        }
+        Console.WriteLine("Journal saved to file.");
+    }
+
+    public void LoadEntriesFromFile(string filePath)
+    {
+        if (File.Exists(filePath))
+        {
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] parts = line.Split(',');
+                    if (parts.Length == 3)
+                    {
+                        Entry entry = new Entry
+                        {
+                            _date = parts[0],
+                            _prompt = parts[1],
+                            _response = parts[2]
+                        };
+                        AddEntry(entry);
+                    }
+                }
+            }
+            Console.WriteLine("Journal loaded from file.");
+        }
+        else
+        {
+            Console.WriteLine("No journal file found.");
+        }
     }
 }
 
@@ -75,30 +128,27 @@ class Program
 
                     Entry entry = new Entry
                     {
-                        Prompt = question,
-                        Response = response,
-                        Date = date // Set the current date
+                        _prompt = question,
+                        _response = response,
+                        _date = date // Set the current date
                     };
                     journal.AddEntry(entry);
                     break;
 
                 case 2:
-                    // Display all journal entries with the current date
-                    List<Entry> allEntries = journal.GetAllEntries();
-                    foreach (var journalEntry in allEntries)
-                    {
-                        Console.WriteLine($"Date: {journalEntry.Date}");
-                        Console.WriteLine($"Prompt: {journalEntry.Prompt}");
-                        Console.WriteLine($"Response: {journalEntry.Response}\n");
-                    }
+                    journal.DisplayAllEntries();
                     break;
 
                 case 3:
-                    // Implement saving to a file
+                    Console.WriteLine("Enter the file name to save: ");
+                    string saveFileName = Console.ReadLine();
+                    journal.SaveEntriesToFile(saveFileName); // Save the journal to the specified file
                     break;
 
                 case 4:
-                    // Implement loading from a file
+                    Console.WriteLine("Enter the file name to load: ");
+                    string loadFileName = Console.ReadLine();
+                    journal.LoadEntriesFromFile(loadFileName); // Load the journal from the specified file
                     break;
 
                 case 5:
