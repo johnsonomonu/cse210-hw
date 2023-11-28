@@ -1,0 +1,4 @@
+Run a Marathon|Run 26.2 miles in one go|1000|0|0
+Read Scriptures|Read scriptures daily|100|0|0
+Attend Temple|Attend the temple|50|10|500
+UserScore|1150
